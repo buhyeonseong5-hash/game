@@ -35,7 +35,7 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-height: 60vh;
+            max-height: 55vh;
         }
 
         canvas#tetris {
@@ -53,7 +53,7 @@
             max-width: 500px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
+            gap: 0.75rem;
             padding-bottom: env(safe-area-inset-bottom, 1rem);
         }
 
@@ -67,7 +67,7 @@
             font-weight: bold;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s, background-color 0.1s;
+            transition: transform 0.05s, background-color 0.1s;
         }
 
         .joy-btn:active {
@@ -93,7 +93,7 @@
 <body>
 
     <div id="game-wrapper">
-        <!-- Status Bar -->
+        <!-- 상태 표시줄 -->
         <div class="w-full max-w-md flex justify-between items-center bg-slate-800/50 p-3 rounded-2xl border border-slate-700">
             <div class="flex flex-col">
                 <span class="text-[10px] text-slate-400 uppercase tracking-tighter">Score</span>
@@ -103,7 +103,7 @@
             <div class="flex items-center gap-4">
                 <div class="flex flex-col items-end">
                     <span class="text-[10px] text-slate-400 uppercase tracking-tighter text-right">Next</span>
-                    <canvas id="next" width="60" height="60"></canvas>
+                    <canvas id="next" width="50" height="50"></canvas>
                 </div>
                 <div class="flex flex-col items-center">
                     <span class="text-[10px] text-slate-400 uppercase tracking-tighter">LV</span>
@@ -112,48 +112,53 @@
             </div>
         </div>
 
-        <!-- Board Area -->
-        <div class="canvas-container">
+        <!-- 게임 보드 영역 (스와이프 가능) -->
+        <div id="swipe-area" class="canvas-container">
             <canvas id="tetris" width="300" height="600"></canvas>
             
+            <!-- 오버레이 (시작/종료) -->
             <div id="overlay" class="absolute inset-0 z-10 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-6 transition-opacity">
                 <h2 id="overlay-text" class="text-5xl font-black mb-8 italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-purple-500">
                     TETRIS
                 </h2>
+                <div class="text-slate-400 text-xs mb-6 space-y-1">
+                    <p>Swipe: 이동 / Tap: 회전</p>
+                    <p>Swipe Down: 소프트 드롭</p>
+                </div>
                 <button id="start-btn" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black text-xl shadow-lg shadow-blue-500/30 active:scale-95 transition-transform">
                     START
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Controller -->
+        <!-- 모바일 컨트롤 패드 -->
         <div class="control-pad">
             <div class="grid grid-cols-3 grid-rows-2 gap-2 col-span-2">
                 <div class="col-start-2">
                     <div id="btn-up" class="joy-btn w-full h-full">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                     </div>
                 </div>
                 <div class="col-start-1 row-start-2">
                     <div id="btn-left" class="joy-btn w-full h-full">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     </div>
                 </div>
                 <div class="col-start-2 row-start-2">
                     <div id="btn-down" class="joy-btn w-full h-full">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
                 <div class="col-start-3 row-start-2">
                     <div id="btn-right" class="joy-btn w-full h-full">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </div>
                 </div>
             </div>
             
             <div class="flex flex-col gap-2">
-                <div id="btn-rotate" class="joy-btn action-btn w-full h-full text-sm">ROTATE</div>
-                <div id="btn-hard" class="joy-btn bg-purple-600/80 active:bg-purple-500 w-full h-full text-sm">DROP</div>
+                <div id="btn-rotate" class="joy-btn action-btn w-full h-full text-xs">ROTATE</div>
+                <div id="btn-hard" class="joy-btn bg-purple-600/80 active:bg-purple-500 w-full h-full text-xs">DROP</div>
             </div>
         </div>
     </div>
@@ -168,6 +173,7 @@
         const overlay = document.getElementById('overlay');
         const overlayText = document.getElementById('overlay-text');
         const startBtn = document.getElementById('start-btn');
+        const swipeArea = document.getElementById('swipe-area');
 
         const COLS = 10;
         const ROWS = 20;
@@ -208,16 +214,11 @@
                     if (value !== 0) {
                         const px = (x + offset.x) * size;
                         const py = (y + offset.y) * size;
-                        
                         ctx.fillStyle = COLORS[value];
                         ctx.fillRect(px, py, size, size);
-                        
-                        // Border & Shadow
                         ctx.strokeStyle = 'rgba(0,0,0,0.3)';
                         ctx.lineWidth = 1;
                         ctx.strokeRect(px, py, size, size);
-                        
-                        // Highlight
                         ctx.fillStyle = 'rgba(255,255,255,0.2)';
                         ctx.fillRect(px, py, size, size / 8);
                     }
@@ -228,8 +229,6 @@
         function draw() {
             context.fillStyle = '#1e293b';
             context.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Subtle Grid
             context.strokeStyle = 'rgba(51, 65, 85, 0.5)';
             context.lineWidth = 0.5;
             for(let i=0; i<=COLS; i++) {
@@ -238,14 +237,11 @@
             for(let i=0; i<=ROWS; i++) {
                 context.beginPath(); context.moveTo(0, i * BLOCK_SIZE); context.lineTo(canvas.width, i * BLOCK_SIZE); context.stroke();
             }
-
             drawMatrix(arena, {x: 0, y: 0});
             drawMatrix(player.matrix, player.pos);
-
-            // Next Piece Preview
             nextContext.fillStyle = '#1e293b';
             nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-            const nSize = 12;
+            const nSize = 10;
             const nextOffset = {
                 x: (nextCanvas.width / nSize - nextPiece.matrix[0].length) / 2,
                 y: (nextCanvas.height / nSize - nextPiece.matrix.length) / 2
@@ -388,7 +384,7 @@
             requestAnimationFrame(update);
         }
 
-        // Input Handling (Keyboard)
+        // 키보드 조작
         document.addEventListener('keydown', event => {
             if (!gameActive) return;
             if (event.key === 'ArrowLeft') playerMove(-1);
@@ -400,7 +396,7 @@
 
         startBtn.addEventListener('click', resetGame);
 
-        // Mobile Touch (Pointer Events for better response)
+        // 버튼 조작 (Pointer Events로 반응성 향상)
         const setupTouch = (id, action) => {
             const el = document.getElementById(id);
             el.addEventListener('pointerdown', (e) => {
@@ -416,7 +412,47 @@
         setupTouch('btn-rotate', () => playerRotate(1));
         setupTouch('btn-hard', () => playerHardDrop());
 
-        // Prevent zoom on double tap
+        // 스와이프 및 터치 제스처
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isMoving = false;
+
+        swipeArea.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isMoving = false;
+        }, { passive: false });
+
+        swipeArea.addEventListener('touchmove', (e) => {
+            if (!gameActive) return;
+            e.preventDefault();
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            const dx = touchX - touchStartX;
+            const dy = touchY - touchStartY;
+
+            // 좌우 스와이프 (임계값 30px)
+            if (Math.abs(dx) > 30) {
+                playerMove(dx > 0 ? 1 : -1);
+                touchStartX = touchX; 
+                isMoving = true;
+            }
+            // 아래 스와이프 (소프트 드롭)
+            if (dy > 40) {
+                playerDrop();
+                touchStartY = touchY;
+                isMoving = true;
+            }
+        }, { passive: false });
+
+        swipeArea.addEventListener('touchend', (e) => {
+            // 움직임 없이 터치만 했다면 회전
+            if (!isMoving && gameActive) {
+                playerRotate(1);
+            }
+        });
+
+        // 더블 탭 확대 방지
         document.addEventListener('touchstart', (e) => {
             if (e.touches.length > 1) e.preventDefault();
         }, { passive: false });
